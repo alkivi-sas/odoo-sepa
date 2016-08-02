@@ -15,6 +15,7 @@
                         <field name="bic"/>
                         <field name="rum"/>
                         <field name="sepa_name"/>
+                        <field name="mandat_creation_date"/>
                     </group>
                 </page>
                 </page>

@@ -32,6 +32,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'templates.xml',
+        'views/partner_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
