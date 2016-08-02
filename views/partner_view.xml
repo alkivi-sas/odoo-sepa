@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_partner_sepa_form" model="ir.ui.view">
+            <field name="name">res.partner.property.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="priority">2</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="groups_id" eval="[(5, ref('account.group_account_invoice'))]"/>
+            <field name="arch" type="xml">
+                <page name="sales_purchases" position="after">
+                <page string="SEPA" col="4" name="sepa" attrs="{'invisible': [('is_company','=',False),('parent_id','!=',False)]}">
+                    <group>
+                        <field name="iban"/>
+                        <field name="bic"/>
+                        <field name="rum"/>
+                        <field name="sepa_name"/>
+                    </group>
+                </page>
+                </page>
+            </field>
+        </record>
+    </data>
+</openerp>
