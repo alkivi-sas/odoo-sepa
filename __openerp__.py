@@ -11,7 +11,7 @@
         To perform that we extended res.partner with extra information such as
         IBAN
         BIC
-        RUM (Unique Number assigned by the bank)
+        RUM (Référence Unique de Mandat)
         BANK_NAME (If different that its name)
         
     """,

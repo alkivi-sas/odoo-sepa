@@ -2,7 +2,12 @@
 
 from openerp import models, fields, api
 
-# class alkivi_sepa(models.Model):
-#     _name = 'alkivi_sepa.alkivi_sepa'
+class sepa_res_partner(models.Model):
+    _name = 'res.partner'
+    _inherit = 'res.partner'
 
-#     name = fields.Char()
+    iban = fields.Char(string='International Bank Account Number (IBAN)', size=34)
+    bic = fields.Char(string='Bank Identifier Code (BIC)', size=12)
+    rum = fields.Char('Référence Unique de Mandat', size=35)
+    sepa_name = fields.Char('Name in bank', size=128)
+
