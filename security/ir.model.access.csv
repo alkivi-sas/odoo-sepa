@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_alkivi_sepa_alkivi_sepa,alkivi_sepa.alkivi_sepa,model_alkivi_sepa_alkivi_sepa,,1,0,0,0
