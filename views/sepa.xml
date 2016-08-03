@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+
+        <record model="ir.actions.act_window" id="action_alkivi_sepa">
+            <field name="name">Mandats SEPA Alkivi</field>
+            <field name="res_model">alkivi.sepa</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record model="ir.ui.view" id="view_alkivi_sepa_tree">
+            <field name="name">alkivi.sepa.tree</field>
+            <field name="model">alkivi.sepa</field>
+            <field name="arch" type="xml">
+                <tree string="Mandats SEPA">
+                    <field name='name' />
+                    <field name='date' />
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_alkivi_sepa_form">
+            <field name="name">alkivi.sepa.form</field>
+            <field name="model">alkivi.sepa</field>
+            <field name="arch" type="xml">
+                <form string="Course Form">
+                    <group>
+                        <field name="name"/>
+                        <field name="date"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <menuitem name="Mandats SEPA" parent="alkivi.menu_alkivi_finance" id="menu_alkivi_sepa" action="action_alkivi_sepa" sequence="10"/>
+
+
+    </data>
+</openerp>
