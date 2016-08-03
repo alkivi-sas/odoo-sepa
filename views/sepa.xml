@@ -25,10 +25,23 @@
             <field name="model">alkivi.sepa</field>
             <field name="arch" type="xml">
                 <form string="Course Form">
-                    <group>
-                        <field name="name"/>
-                        <field name="date"/>
-                    </group>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="date"/>
+                        </group>
+                        <notebook>
+                            <page string="Lines">
+                                <field name="line_ids">
+                                    <tree string="Mandat Line">
+                                        <field name="partner_id"/>
+                                        <field name="invoice_id"/>
+                                        <field name="amount_total"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
                 </form>
             </field>
         </record>

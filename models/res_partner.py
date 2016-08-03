@@ -18,6 +18,21 @@ class sepa_res_partner(models.Model):
     mandat_creation_date = fields.Datetime(string='Mandant creation date')
 
     @api.one
+    def can_sepa(self):
+        """
+        A res.partner can sepa if the following fields are set:
+        - iban
+        - bic
+        - rum
+        - sepa_name
+        - mandat_creation_date
+        """
+
+        return (self.iban or self.bic or self.rum
+                or self.sepa_name or self.mandat_creation_date)
+
+
+    @api.one
     @api.constrains('iban')
     def _check_description(self):
         """
