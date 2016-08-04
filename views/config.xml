@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_alkivi_sepa_config_settings" model="ir.ui.view">
+            <field name="name">alkivi sepa settings</field>
+            <field name="model">alkivi.sepa.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Configure Alkivi Sepa">
+                    <header>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <group string="Available settings">
+                        <field name="bank_name" />
+                        <field name="iban" />
+                        <field name="bic" />
+                        <field name="creditor_id" />
+                        <field name="currency" />
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_alkivi_sepa_config" model="ir.actions.act_window">
+            <field name="name">Alkivi Sepa Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">alkivi.sepa.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+        <menuitem id="menu_alkivi_sepa_config" name="Alkivi Sepa" parent="base.menu_config"
+            sequence="16" action="action_alkivi_sepa_config"/>
+
+    </data>
+</openerp>

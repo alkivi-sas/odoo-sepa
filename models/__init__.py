@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import config
 import alkivi_sepa
 import res_partner
 

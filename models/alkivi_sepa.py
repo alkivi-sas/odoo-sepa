@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from openerp import models, fields, api
 from openerp.addons import account
 
@@ -8,7 +10,7 @@ class alkivi_sepa(models.Model):
     _description = 'SEPA Report'
 
     name = fields.Text(string='Description')
-    date = fields.Datetime(string='Mandat creation date', required=True)
+    date = fields.Datetime(string='Mandat creation date', required=True, default=datetime.datetime.today())
     line_ids = fields.One2many('alkivi.sepa.line', 'sepa_id', string="Lines")
 
 
