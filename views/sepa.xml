@@ -24,7 +24,11 @@
             <field name="name">alkivi.sepa.form</field>
             <field name="model">alkivi.sepa</field>
             <field name="arch" type="xml">
-                <form string="Course Form">
+                <form string="Mandat details">
+                    <header>
+                        <button string="Download XML" type="object" name="get_xml"
+                            class="oe_highlight" />
+                    </header>
                     <sheet>
                         <group>
                             <field name="name"/>
