@@ -55,15 +55,18 @@ class alkivi_sepa(models.Model):
             invoice = line.invoice_id
             partner = line.partner_id
 
+            collection_date = datetime.datetime.strptime(self.collection_date, '%Y-%m-%d %H:%M:%S')
+            mandate_date = datetime.datetime.strptime(partner.mandat_creation_date, '%Y-%m-%d %H:%M:%S')
+
             payment = {
                     "name": partner.sepa_name,
                     "IBAN": partner.iban,
                     "BIC": partner.bic,
                     "amount": int(invoice.amount_total*100),
                     "type": "OOFF",
-                    "collection_date": self.collection_date,
+                    "collection_date": collection_date,
                     "mandate_id": partner.rum,
-                    "mandate_date": partner.mandat_creation_date,
+                    "mandate_date": mandate_date,
                     "description": 'Facture Alkivi {0}'.format(invoice.number),
             }
             sepa.add_payment(payment)

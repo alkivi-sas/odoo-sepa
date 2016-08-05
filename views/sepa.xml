@@ -16,6 +16,7 @@
                 <tree string="Mandats SEPA">
                     <field name='name' />
                     <field name='date' />
+                    <field name='collection_date' />
                 </tree>
             </field>
         </record>
@@ -33,6 +34,7 @@
                         <group>
                             <field name="name"/>
                             <field name="date"/>
+                            <field name="collection_date"/>
                         </group>
                         <notebook>
                             <page string="Lines">
