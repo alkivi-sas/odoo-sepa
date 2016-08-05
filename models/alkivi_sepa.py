@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+from dateutil.relativedelta import relativedelta
 
 from openerp import models, fields, api
 from openerp.addons import account
@@ -10,13 +11,30 @@ from .tools.PySepaDD import PySepaDD
 
 logger = logging.getLogger(__name__)
 
+
 class alkivi_sepa(models.Model):
     _name = 'alkivi.sepa'
     _description = 'SEPA Report'
 
     name = fields.Text(string='Description')
     date = fields.Datetime(string='Mandat creation date', required=True, default=datetime.datetime.today())
+    collection_date = fields.Datetime(string='Mandat collection date', required=True, default=lambda self: self._get_collection_date())
     line_ids = fields.One2many('alkivi.sepa.line', 'sepa_id', string="Lines")
+
+    @api.model
+    def _get_collection_date(self):
+        """
+        Set the default collection date at:
+        - the 20 of current month
+        - ensuring at least 4 days from now
+        """
+        today = datetime.datetime.today()
+        min_interval = datetime.timedelta(days=4)
+
+        wanted_date = today.replace(day = 20)
+        if wanted_date - today < min_interval:
+            wanted_date = today + min_interval
+        return wanted_date
 
     @api.multi
     def generate_xml(self):
@@ -43,9 +61,9 @@ class alkivi_sepa(models.Model):
                     "BIC": partner.bic,
                     "amount": int(invoice.amount_total*100),
                     "type": "OOFF",
-                    "collection_date": datetime.date.today(),
+                    "collection_date": self.collection_date,
                     "mandate_id": partner.rum,
-                    "mandate_date": datetime.date.today(),
+                    "mandate_date": partner.mandat_creation_date,
                     "description": 'Facture Alkivi {0}'.format(invoice.number),
             }
             sepa.add_payment(payment)
