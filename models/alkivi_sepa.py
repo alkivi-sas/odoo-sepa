@@ -26,10 +26,10 @@ class alkivi_sepa(models.Model):
         """
         Set the default collection date at:
         - the 20 of current month
-        - ensuring at least 4 days from now
+        - ensuring at least 5 days from now
         """
         today = datetime.datetime.today()
-        min_interval = datetime.timedelta(days=4)
+        min_interval = datetime.timedelta(days=5)
 
         wanted_date = today.replace(day = 20)
         if wanted_date - today < min_interval:
@@ -55,8 +55,8 @@ class alkivi_sepa(models.Model):
             invoice = line.invoice_id
             partner = line.partner_id
 
-            collection_date = datetime.datetime.strptime(self.collection_date, '%Y-%m-%d %H:%M:%S')
-            mandate_date = datetime.datetime.strptime(partner.mandat_creation_date, '%Y-%m-%d %H:%M:%S')
+            collection_date = datetime.datetime.strptime(self.collection_date, '%Y-%m-%d %H:%M:%S').date()
+            mandate_date = datetime.datetime.strptime(partner.mandat_creation_date, '%Y-%m-%d %H:%M:%S').date()
 
             payment = {
                     "name": partner.sepa_name,
