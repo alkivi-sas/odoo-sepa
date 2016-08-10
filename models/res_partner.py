@@ -4,6 +4,7 @@ import re
 import logging
 
 from openerp import models, fields, api
+from openerp.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,8 @@ class sepa_res_partner(models.Model):
 
         for record in self:
             iban = self.iban
+            if not iban:
+                return
 
             # Enlever les caractères indésirables (espaces, tirets)
             iban = '{0}'.format(iban).translate(None, ' -')
