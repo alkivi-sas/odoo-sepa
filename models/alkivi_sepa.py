@@ -63,7 +63,7 @@ class alkivi_sepa(models.Model):
                     "IBAN": partner.iban,
                     "BIC": partner.bic,
                     "amount": int(invoice.amount_total*100),
-                    "type": "OOFF",
+                    "type": "RCUR",
                     "collection_date": collection_date,
                     "mandate_id": partner.rum,
                     "mandate_date": mandate_date,
