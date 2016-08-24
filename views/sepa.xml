@@ -29,6 +29,8 @@
                     <header>
                         <button string="Download XML" type="object" name="get_xml"
                             class="oe_highlight" />
+                        <button string="Mark as paid" type="object" name="pay_invoices"
+                            class="oe_highlight" />
                     </header>
                     <sheet>
                         <group>
