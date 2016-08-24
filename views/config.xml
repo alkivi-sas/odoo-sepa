@@ -17,6 +17,8 @@
                         <field name="bic" />
                         <field name="creditor_id" />
                         <field name="currency" />
+                        <field name="journal_id" />
+                        <field name="bank_account_id" />
                     </group>
                 </form>
             </field>

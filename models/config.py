@@ -11,6 +11,8 @@ class sepa_config_settings(osv.osv_memory):
             'bic': fields.char('Our BIC', size=48),
             'creditor_id': fields.char('Our Creditor ID', size=48),
             'currency': fields.char('Our currency', size=48),
+            'bank_account_id': fields.char('Our Bank Account ID', size=48),
+            'journal_id': fields.char('Our Bank Journal ID', size=48),
     }
 
     def get_default_bank_name(self, cr, uid, ids, context=None):
@@ -42,6 +44,18 @@ class sepa_config_settings(osv.osv_memory):
 
     def set_default_currency(self, cr, uid, ids, context=None):
         return self._set_default(cr, uid, ids, context, 'currency')
+
+    def get_default_journal_id(self, cr, uid, ids, context=None):
+        return self._get_default(cr, uid, ids, context, 'journal_id')
+
+    def set_default_journal_id(self, cr, uid, ids, context=None):
+        return self._set_default(cr, uid, ids, context, 'journal_id')
+    
+    def get_default_bank_account_id(self, cr, uid, ids, context=None):
+        return self._get_default(cr, uid, ids, context, 'bank_account_id')
+    
+    def set_default_bank_account_id(self, cr, uid, ids, context=None):
+        return self._set_default(cr, uid, ids, context, 'bank_account_id')
 
     def _get_default(self, cr, uid, ids, context, param_name):
         """Get default value if already defined"""

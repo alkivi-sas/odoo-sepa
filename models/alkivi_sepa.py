@@ -107,8 +107,8 @@ class alkivi_sepa(models.Model):
             raise osv.except_osv(_("Warning"), _("Found multiple period for date of transaction %s" % date))
         period_id = period_ids[0].id
         partner_id = self.env['res.partner']._find_accounting_partner(invoice.partner_id).id,
-        logger.debug('Period : {0}'.format(period_id))
-        logger.debug('Partner : {0}'.format(partner_id))
+        journal_id = self.env['ir.values'].get_default('alkivi.sepa.config','journal_id')
+        account_id = self.env['ir.values'].get_default('alkivi.sepa.config','bank_account_id')
         voucher_data = {
             'partner_id': partner_id[0],
             'amount': invoice.amount_total,
