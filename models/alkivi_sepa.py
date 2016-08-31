@@ -57,12 +57,15 @@ class alkivi_sepa(models.Model):
 
             collection_date = datetime.datetime.strptime(self.collection_date, '%Y-%m-%d %H:%M:%S').date()
             mandate_date = datetime.datetime.strptime(partner.mandat_creation_date, '%Y-%m-%d %H:%M:%S').date()
-
+            #invoice.amount_total has to be formated like that for the sepa or you will have round problems
+            amount = '%.2f' % (invoice.amount_total*100)
+            amount = float(amount)
+            amount = int(amount)
             payment = {
                     "name": partner.sepa_name,
                     "IBAN": partner.iban,
                     "BIC": partner.bic,
-                    "amount": int(invoice.amount_total*100),
+                    "amount": amount,
                     "type": "RCUR",
                     "collection_date": collection_date,
                     "mandate_id": partner.rum,
@@ -82,14 +85,81 @@ class alkivi_sepa(models.Model):
         }                  
 
     @api.multi
+    def get_period(self, date):
+        """
+            Return date period 
+        """
+        # Fetch correct period_id according to transaction date
+        search_args = [('date_start', '<=', date), ('date_stop', '>=', date), ('special', '=', False)]
+        period_ids = self.env['account.period'].search(search_args)
+        logger.debug('Period possible : {0}'.format(period_ids))
+        if not period_ids:
+            raise osv.except_osv(_("Warning"), _("Unable to find a period for today  %s" % date))
+        elif len(period_ids) > 1:
+            raise osv.except_osv(_("Warning"), _("Found multiple period for today %s" % date))
+        return period_ids[0].id
+
+    @api.multi
     def pay_invoices(self):
         """
         Mark as paid all invoices that has been paid trough this sepa
         """
         logger.debug('Pay all invoices of mandat id:{0}'.format(self.id))
+        amount_to_reconciliate = 0
         for line in self.line_ids:
             invoice = line.invoice_id
-            self.pay_invoice(invoice)
+            amount_to_reconciliate += round(invoice.amount_total,2)
+            if invoice.state == 'open':
+                voucher_id = self.pay_invoice(invoice)
+                self.validate_voucher_moves(voucher_id)
+            else:
+                logger.info('We can\'t mark as paid invoice id:{0}. It is not open state'.format(invoice.id))
+        
+        logger.debug('We will create a Account Move for : {0}€'.format(amount_to_reconciliate))
+        journal_id = int(self.env['ir.values'].get_default('alkivi.sepa.config','journal_id'))
+        account_id = int(self.env['ir.values'].get_default('alkivi.sepa.config','bank_account_id'))
+        move = self.env['account.move'].create({
+            'journal_id': journal_id,
+            'date': self.date,
+            'state': 'posted',
+        })
+        period_id = self.get_period(self.date)
+        logger.debug('We created an Account Move id : {}'.format(move))
+        credit_move_line = {
+                    'journal_id': journal_id,
+                    'name': '/',
+                    'account_id': account_id,
+                    'move_id': move.id,
+                    'period_id': period_id,
+                    'quantity': 1,
+                    'credit': amount_to_reconciliate,
+                    'debit': 0.0,
+                    'date': self.date,
+                    'amount_currency': 0.0,
+        }
+        logger.debug('Credit_line to be created : {0}'.format(credit_move_line))
+        credit_move_line = self.env['account.move.line'].create(credit_move_line)
+        debit_move_line ={
+                    'journal_id': journal_id,
+                    'name': '/',
+                    'account_id': account_id,
+                    'move_id': move.id,
+                    'period_id': period_id,
+                    'quantity': 1,
+                    'debit': amount_to_reconciliate,
+                    'credit': 0.0,
+                    'date': self.date,
+                    'amount_currency': 0.0,
+        }
+        credit_move_line = self.env['account.move.line'].create(debit_move_line)
+        move.post()
+
+    @api.multi
+    def validate_voucher_moves(self, voucher_id):
+        logger.debug('We will mark voucher id:{} moves as validated'.format(voucher_id))        
+        moves = self.env['account.move'].search([['id', '=', voucher_id.move_id.id]])
+        for move in moves:
+            move.state = 'posted'
 
     @api.multi
     def pay_invoice(self, invoice):
@@ -97,25 +167,17 @@ class alkivi_sepa(models.Model):
         
         # Fetch correct period_id according to transaction date
         date = self.date
-        search_args = [('date_start', '<=', date), ('date_stop', '>=', date), ('special', '=', False),
-                ('company_id', '=', invoice.company_id.id)]
-        period_ids = self.env['account.period'].search(search_args)
-        logger.debug('Period possible : {0}'.format(period_ids))
-        if not period_ids:
-            raise osv.except_osv(_("Warning"), _("Unable to find a period for date of transaction %s" % date))
-        elif len(period_ids) > 1:
-            raise osv.except_osv(_("Warning"), _("Found multiple period for date of transaction %s" % date))
-        period_id = period_ids[0].id
+        period_id = self.get_period(self.date)
         partner_id = self.env['res.partner']._find_accounting_partner(invoice.partner_id).id,
         journal_id = self.env['ir.values'].get_default('alkivi.sepa.config','journal_id')
         account_id = self.env['ir.values'].get_default('alkivi.sepa.config','bank_account_id')
         voucher_data = {
             'partner_id': partner_id[0],
             'amount': invoice.amount_total,
-            'journal_id': 9, #CIC Lille id, to put in config
+            'journal_id': journal_id, #CIC Lille id, to put in config
             'date': date,
             'period_id': period_id,
-            'account_id': 973, #Cic Account, to put in config
+            'account_id': account_id, #Cic Account, to put in config
             'type': invoice.type in ('out_invoice','out_refund') and 'receipt' or 'payment',
             'reference' : invoice.name,
         }
@@ -124,11 +186,6 @@ class alkivi_sepa(models.Model):
         logger.debug(voucher_data)
 
         voucher_id = self.env['account.voucher'].create(voucher_data)
-        logger.debug('test')
-        logger.debug(voucher_id)
-
-        # Equivalent to workflow proform
-        #self.env['account.voucher'].write([voucher_id], {'state':'draft'})
 
         # Need to create basic account.voucher.line according to the type of invoice need to check stuff ...
         double_check = 0
@@ -171,8 +228,8 @@ class alkivi_sepa(models.Model):
 
         # Where the magic happen
         voucher_id.signal_workflow("proforma_voucher")
-        #self.env['account.voucher'].button_proforma_voucher([voucher_id])
         logger.info('Invoice was mark as paid')
+        return voucher_id
 
 
 class alkivi_sepa_line(models.Model):
