@@ -120,10 +120,10 @@ class alkivi_sepa(models.Model):
         account_id = int(self.env['ir.values'].get_default('alkivi.sepa.config','bank_account_id'))
         move = self.env['account.move'].create({
             'journal_id': journal_id,
-            'date': self.date,
+            'date': self.collection_date,
             'state': 'posted',
         })
-        period_id = self.get_period(self.date)
+        period_id = self.get_period(self.collection_date)
         logger.debug('We created an Account Move id : {}'.format(move))
         credit_move_line = {
                     'journal_id': journal_id,
@@ -134,7 +134,7 @@ class alkivi_sepa(models.Model):
                     'quantity': 1,
                     'credit': amount_to_reconciliate,
                     'debit': 0.0,
-                    'date': self.date,
+                    'date': self.collection_date,
                     'amount_currency': 0.0,
         }
         logger.debug('Credit_line to be created : {0}'.format(credit_move_line))
@@ -148,7 +148,7 @@ class alkivi_sepa(models.Model):
                     'quantity': 1,
                     'debit': amount_to_reconciliate,
                     'credit': 0.0,
-                    'date': self.date,
+                    'date': self.collection_date,
                     'amount_currency': 0.0,
         }
         credit_move_line = self.env['account.move.line'].create(debit_move_line)
@@ -166,8 +166,8 @@ class alkivi_sepa(models.Model):
         logger.debug('We will mark invoice id:{} as paid'.format(invoice))        
         
         # Fetch correct period_id according to transaction date
-        date = self.date
-        period_id = self.get_period(self.date)
+        date = self.collection_date
+        period_id = self.get_period(self.collection_date)
         partner_id = self.env['res.partner']._find_accounting_partner(invoice.partner_id).id,
         journal_id = self.env['ir.values'].get_default('alkivi.sepa.config','journal_id')
         account_id = self.env['ir.values'].get_default('alkivi.sepa.config','bank_account_id')
