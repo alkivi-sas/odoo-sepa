@@ -94,9 +94,9 @@ class alkivi_sepa(models.Model):
         period_ids = self.env['account.period'].search(search_args)
         logger.debug('Period possible : {0}'.format(period_ids))
         if not period_ids:
-            raise osv.except_osv(_("Warning"), _("Unable to find a period for today  %s" % date))
+            raise Exception("Unable to find a period for today  %s" % date)
         elif len(period_ids) > 1:
-            raise osv.except_osv(_("Warning"), _("Found multiple period for today %s" % date))
+            raise Exception("Found multiple period for today %s" % date)
         return period_ids[0].id
 
     @api.multi
@@ -219,11 +219,11 @@ class alkivi_sepa(models.Model):
         if double_check == 0:
             logger.warning(invoice)
             logger.warning(voucher_id)
-            raise osv.except_osv(_("Warning"), _("I did not create any voucher line"))
+            raise Exception("I did not create any voucher line")
         elif double_check > 1:
             logger.warning(invoice)
             logger.warning(voucher_id)
-            raise osv.except_osv(_("Warning"), _("I created multiple voucher line ??"))
+            raise Exception("I created multiple voucher line ??")
 
 
         # Where the magic happen
