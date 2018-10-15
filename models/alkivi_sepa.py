@@ -106,14 +106,19 @@ class alkivi_sepa(models.Model):
         """
         logger.debug('Pay all invoices of mandat id:{0}'.format(self.id))
         amount_to_reconciliate = 0
+
+        # First check, all invoice must be open
+        for line in self.line_ids:
+            invoice = line.invoice_id
+            if invoice.state != 'open':
+                msg = 'Invoice id:{0} is not in open state'.format(invoice.id)
+                raise osv.except_osv(_("Warning"), _(msg))
+
         for line in self.line_ids:
             invoice = line.invoice_id
             amount_to_reconciliate += round(invoice.amount_total,2)
-            if invoice.state == 'open':
-                voucher_id = self.pay_invoice(invoice)
-                self.validate_voucher_moves(voucher_id)
-            else:
-                logger.info('We can\'t mark as paid invoice id:{0}. It is not open state'.format(invoice.id))
+            voucher_id = self.pay_invoice(invoice)
+            self.validate_voucher_moves(voucher_id)
         
         logger.debug('We will create a Account Move for : {0}€'.format(amount_to_reconciliate))
         journal_id = int(self.env['ir.values'].get_default('alkivi.sepa.config','journal_id'))
