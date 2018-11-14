@@ -22,6 +22,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
+    'icon': '/alkivi_sepa/static/src/img/icon.png',
     'category': 'Invoicing & Payments',
     'version': '8.0',
 
